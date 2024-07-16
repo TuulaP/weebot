@@ -18,7 +18,8 @@ def sendSimpleToot (tootText="TEST234", language = "fi", visibility = "public"):
     APPTOKEN = os.getenv('APPTOKEN')
     BEARERTOKEN = os.getenv('BEARERTOKEN')
 
-    #print("BEARERTOK: ", BEARERTOKEN)
+    if DEBUG > 0:
+        print("BEARERTOK: ", BEARERTOKEN)
 
     print(tootText)
 
@@ -36,11 +37,14 @@ def sendSimpleToot (tootText="TEST234", language = "fi", visibility = "public"):
 
     }
     
-    response = requests.post(
-        api_base_url,
-        data = payload,
-        headers = headers
-    )
+    if BEARERTOKEN is not None:
+        response = requests.post(
+            api_base_url,
+            data = payload,
+            headers = headers
+        )
+    else:
+        print("ERR, conf file missing.")
     
 
     if (DEBUG > 0):
