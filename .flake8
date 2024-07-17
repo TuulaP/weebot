@@ -4,4 +4,5 @@
 
 per-file-ignores =
     saabot.py:E265,E266,E303,W391,E203,E251,E231,E211
+    saadata.py:E265,E266,E303,W391,E203,E251,E231,E211,E501
     

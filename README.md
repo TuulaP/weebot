@@ -23,14 +23,18 @@ Thanks for data
 
 ### TODO
 
-* utilize: https://github.com/pnuu/fmiopendata in some way.
-* add rain info
 * add emojis to toot for weather flare
+* datetime utc warning deprecation removal 
+* nicer formatting for datestamp
+* Show data for bit more places for efficiency 4x4?
+
+
+
+### Done
+
+* Redone with  https://github.com/pnuu/fmiopendata 
+* added rain & snow info
+
+
 
 * 🐈‍⬛
-
-
-
-
-
-
