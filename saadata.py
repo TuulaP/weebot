@@ -2,7 +2,9 @@
 
 import sys
 import xml.etree.ElementTree as ET
-import datetime as dt
+#import datetime as dt
+from datetime import datetime as dtime, timezone, timedelta
+
 from fmiopendata.wfs import download_stored_query
 from owslib.wfs import WebFeatureService
 from math import isnan
@@ -21,9 +23,14 @@ def getFmiData (place="Kustavi Isokari"):
 
     # Retrieve the latest hour of data from a bounding box
 
-    end_time = dt.datetime.utcnow()
+    # 3.11 dtime.utcnow() #
+    # 3.12 dtime.now(timezone.utc) # 
+    end_time =  dtime.utcnow()
+    # new format: 2024-07-17T16:08:42 00:00Z'
+    #             2024-07-17 16:10:17.783129
+    #print(end_time)
     #  # new: dt.datetime.now(dt.UTC) ?
-    start_time = end_time - dt.timedelta(hours=1)
+    start_time = end_time - timedelta(hours=1)
 
     # Convert times to properly formatted strings
 
@@ -40,16 +47,24 @@ def getFmiData (place="Kustavi Isokari"):
     # the last two the top right corner coordinates of the bounding box
     # "bbox=18,55,35,75"
 
+    #Helsinki,Mikkeli,Jyväskylä
+    #place={0}&place=Helsinki -> quick fix for multiple places
+    multiloc = place.replace(",","&place=")
+    
+
     obs = download_stored_query("fmi::observations::weather::multipointcoverage",
                             args=["starttime=" + start_time,
                                   "endtime=" + end_time,
-                                  "place={0}".format(place),
+                                  "place={0}".format(multiloc),
+                                  #"place={0}".format(place),
                                     ])
 
 
 
     latest_tstep = max(obs.data.keys())
      
+
+    ##print("voop", obs.data[latest_tstep].keys())
 
     # place name might be diff  from measurement place name
     # for now 1st is enough
@@ -76,13 +91,27 @@ def getFmiData (place="Kustavi Isokari"):
 #    print(obs.data[latest_tstep][measplacename]["Present weather (auto)"]) # 62?81?
 #    print(obs.data[latest_tstep][measplacename]["Precipitation intensity"])
 #    print(obs.data[latest_tstep][measplacename]["Snow depth"])
+    res= {}
+
+    for measplacename in obs.data[latest_tstep].keys():
+        res[measplacename]=(measplacename.split(" ")[0],latest_tstep,
+        obs.data[latest_tstep][measplacename]["Air temperature"],
+        obs.data[latest_tstep][measplacename]["Precipitation amount"],
+        obs.data[latest_tstep][measplacename]["Snow depth"])
 
 
-    return (latest_tstep,
-    obs.data[latest_tstep][measplacename]["Air temperature"],
-    obs.data[latest_tstep][measplacename]["Precipitation amount"],
-    obs.data[latest_tstep][measplacename]["Snow depth"]
-    )
+    #print("Tul",res)
+    
+    return res
+    # if "," in place:
+    #     return res
+    # else:
+    #     return (latest_tstep,
+    #     obs.data[latest_tstep][measplacename]["Air temperature"],
+    #     obs.data[latest_tstep][measplacename]["Precipitation amount"],
+    #     obs.data[latest_tstep][measplacename]["Snow depth"]
+    #     )
+
 
 
 
@@ -173,16 +202,29 @@ if __name__ == "__main__":
     if len(sys.argv) > 1:
         place = sys.argv[1]
     else:
-        place = "Turku"
+        place = "Turku,Tornio"
+
+    allres = getFmiData(place)
+
+    restxt = ""
+
+    for aplace in allres:
+#       wtime, wtemp, wrain, wsnow = getFmiData(place)
+        placen, wtime, wtemp, wrain, wsnow = allres[aplace]
+
+        wrain,_ = fixEmptyRain(wrain)
+        wsnow,_ = fixEmptyRain(wsnow)
+
+        restxt += "Temp at {1} --> {0}C. Rain:{2} mm/h. ❄️:{3}".format(wtemp['value'],placen, wrain, wsnow) + "\n"
 
 
-    wtime, wtemp, wrain, wsnow = getFmiData(place)
 
-    wrain,_ = fixEmptyRain(wrain)
-    wsnow,_ = fixEmptyRain(wsnow)
+    #wtimef = dtime.datetime.now().astimezone().isoformat()
+    wtimef = dtime.now().astimezone().isoformat()
 
-    print("Temp at {2} on {0} --> {1}C. Rain {3} mm/h. ❄️:{4}".format(wtime,wtemp['value'],place, wrain, wsnow))
+    restxt = "Sää {0}\n".format(wtimef)+ restxt
 
+    print(restxt)
     print("The end")
 
 

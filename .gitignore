@@ -7,3 +7,4 @@ tmp/*
 *.txt
 *.bat
 
+test.py

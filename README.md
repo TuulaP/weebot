@@ -10,7 +10,7 @@ Requires
 
 
 ```
-pip install owslib python-dotenv
+pip install owslib python-dotenv fmiopendata
 ```
 
 
@@ -24,17 +24,16 @@ Thanks for data
 ### TODO
 
 * add emojis to toot for weather flare
-* datetime utc warning deprecation removal 
-* nicer formatting for datestamp
-* Show data for bit more places for efficiency 4x4?
-
+* datetime utc warning deprecation removal on 3.12
+* Bug: in some cases multiplace use skips a place(?) (give 3, get 2)
 
 
 ### Done
 
 * Redone with  https://github.com/pnuu/fmiopendata 
 * added rain & snow info
-
+* nicer formatting for datestamp -> (at least is local time accurate)
+* * Show data for bit more places for efficiency 4x4? -> can give names via , -list.
 
 
 * 🐈‍⬛
