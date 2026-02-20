@@ -8,6 +8,8 @@ from datetime import datetime as dtime, timezone, timedelta
 from fmiopendata.wfs import download_stored_query
 from owslib.wfs import WebFeatureService
 from math import isnan
+import datetime
+
 
 
 # https://www.ilmatieteenlaitos.fi/tallennetut-kyselyt 
@@ -25,7 +27,12 @@ def getFmiData (place="Kustavi Isokari"):
 
     # 3.11 dtime.utcnow() #
     # 3.12 dtime.now(timezone.utc) # 
-    end_time =  dtime.utcnow()
+    #end_time =  dtime.utcnow()
+
+    #end_time = datetime.datetime.now(datetime.UTC).strftime('%Y-%m-%d %H:%M:%S.%f')
+    #end_time = datetime.datetime.strptime(end_time, '%Y-%m-%d %H:%M:%S.%f') 
+
+    end_time = datetime.datetime.now(datetime.UTC).replace(tzinfo=None)
     # new format: 2024-07-17T16:08:42 00:00Z'
     #             2024-07-17 16:10:17.783129
     #print(end_time)
